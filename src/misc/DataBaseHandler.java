@@ -78,6 +78,7 @@ public class DataBaseHandler extends Thread {
     private String BackupMainServer_URL = "jdbc:mysql://localhost/";
     private String SubServer_URL = "jdbc:mysql://localhost/";
     private String BackupSubServer_URL = "jdbc:mysql://localhost/";
+    private String CLIENT = "lpdh";
     //private String USERNAME = "base";
     //private String PASSWORD = "theoreticsinc";
     private String USERNAME = "root";
@@ -93,6 +94,9 @@ public class DataBaseHandler extends Thread {
     private String dateTimePaid;
     private String dateTimePaidStamp;
     private String activeRateParameter;
+    private String VIPnumber = "";
+    private String VIPname = "";
+    private Date expDate = null;
     public static JFrame frameX = new JFrame();
 
     static Logger log = LogManager.getLogger(DataBaseHandler.class.getName());
@@ -3014,6 +3018,40 @@ public class DataBaseHandler extends Thread {
             return false;
         }
     }
+    
+    public boolean getVIPlist(String cardCode) {
+        boolean vip = false;
+        try {
+            connection = getConnection(true);
+        
+        ResultSet rs = selectDatabyFields("SELECT * FROM vips." + CLIENT + " WHERE cardCode='" + cardCode + "'");
+        
+        // iterate through the java resultset
+        while (rs.next()) {
+            VIPnumber = rs.getString("cardNumber");
+            VIPname = rs.getString("VIPname");
+            expDate = rs.getDate("expDate");
+            vip = true;
+        }        
+        st.close();
+        connection.close();
+        } catch (SQLException ex) {
+            log.error(ex.getMessage());
+        }
+        return vip;
+    }
+    
+    public String getVIPname() {
+        return VIPname;
+    }
+    
+    public String getVIPnumber() {
+        return VIPnumber;
+    }
+    
+    public Date getVIPexpDate() {
+        return expDate;
+    }    
     
     public boolean saveLog(String activityCode, String activityOwner, String activityDetails) {
         try {

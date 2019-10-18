@@ -14,6 +14,7 @@ import java.awt.image.BufferedImage;
 import java.util.Date;
 import javax.swing.ImageIcon;
 import misc.DataBaseHandler;
+import modules.VIPchecker;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -55,118 +56,130 @@ public class ExitAPI implements Runnable {
                 LogManager.getLogger(ExitAPI.class.getName()).log(Level.SEVERE, null, ex);
             }
              */
-            try {
-                short process = cmp.isValidInputController(NowStamp, false, firstscan, Override, PrinterOverride);//computing stuff                
-                if (process == 0) {
-                    stn.firstscan = true;
-                    //stn.PreviousCard = stn.CardInput2.getText();
-                    stn.processRightPanelMsgs(cmp.PrksMsg);
-                    //stn.validate();
-                    //cmp.ValidPartII();//printing stuff and saving stuff
-                    //do not reset back yet
-                    //stn.trtype = "R";
-                    //PlateInput2.setText("");
-                    //stn.Cardinput.delete(0, stn.Cardinput.length());
-                    //stn.CardInput2.setText("");
+            VIPchecker vChkr = new VIPchecker();
+            if (vChkr.isVIP(stn.CardInput2.getText())) {
+                stn.SysMessage11.setText("*** VIP CARD HOLDER ***");
+                stn.SysMessage13.setText("Card Number: " + vChkr.vipNumber);
+                stn.SysMessage14.setText("VIP NAME : " + vChkr.vipName);
+                stn.SysMessage16.setText("Expiration Date: " + vChkr.expDate);                
+            }
+            if (null == vChkr.expDate || vChkr.expDate.before(NowStamp)) {
+                vChkr.vipNumber = null;
+                vChkr.vipName = null;
+                vChkr.expDate = null;
+                try {
+                    short process = cmp.isValidInputController(NowStamp, false, firstscan, Override, PrinterOverride);//computing stuff                
+                    if (process == 0) {
+                        stn.firstscan = true;
+                        //stn.PreviousCard = stn.CardInput2.getText();
+                        stn.processRightPanelMsgs(cmp.PrksMsg);
+                        //stn.validate();
+                        //cmp.ValidPartII();//printing stuff and saving stuff
+                        //do not reset back yet
+                        //stn.trtype = "R";
+                        //PlateInput2.setText("");
+                        //stn.Cardinput.delete(0, stn.Cardinput.length());
+                        //stn.CardInput2.setText("");
 //                    SysMessage1.setText(CardInput2.getText().substring(0, CardDigits));
 //                    SysMessage2.setText("FOUND");  
-                    DataBaseHandler dbh = new DataBaseHandler();
-                    BufferedImage buf1 = dbh.GetImageFromDB(stn.CardInput2.getText());
-                    BufferedImage buf2 = dbh.Get2ndImageFromDB(stn.CardInput2.getText());
-                    Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+                        DataBaseHandler dbh = new DataBaseHandler();
+                        BufferedImage buf1 = dbh.GetImageFromDB(stn.CardInput2.getText());
+                        BufferedImage buf2 = dbh.Get2ndImageFromDB(stn.CardInput2.getText());
+                        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 
-                    if (null != buf1) {
-                        Image img = getScaledImage(buf1, screenSize.width / 4 + 100, screenSize.height / 3);
+                        if (null != buf1) {
+                            Image img = getScaledImage(buf1, screenSize.width / 4 + 100, screenSize.height / 3);
 
-                        stn.entryCamera.setIcon(new ImageIcon(img));
-                        stn.entryCamera.setText("DRIVERS");
+                            stn.entryCamera.setIcon(new ImageIcon(img));
+                            stn.entryCamera.setText("DRIVERS");
+                        }
+                        if (null != buf2) {
+                            Image img = getScaledImage(buf2, screenSize.width / 4 + 100, screenSize.height / 3);
+
+                            stn.exitCamera.setIcon(new ImageIcon(img));
+                            stn.exitCamera.setText("PLATE");
+                        }
+                        //stn.AmtTendered.requestFocus();
+                        return true;
+                    } else if (process == 1) {
+                        stn.PreviousCard = "";
+                        stn.clearLeftMIDMsgPanel();
+                        stn.clearRightPanel();
+                        stn.StartComparingCard2DB();
+                        //stn.firstscan = false;
+                        //stn.trtype = "R";
+                        //this.InitiateRescan();
+                        //stn.Cardinput.delete(0, stn.Cardinput.length());
+                        //stn.CardInput2.setText("");
+                        //stn.Plateinput.delete(0, stn.Plateinput.length());
+                        //stn.PlateInput2.setText("");
+                        return false;
+                    } else if (process == 4) {
+                        SysMsg[2] = "Card Found";
+                        SysMsg[3] = "Errors";
+                        SysMsg[4] = "Card Unprocessed";
+                        SysMsg[6] = "Please separate card";
+                        stn.trtype = "R";
+                        stn.PreviousCard = "";
+                        stn.Cardinput.delete(0, stn.Cardinput.length());
+                        stn.CardInput2.setText("");
+                        return false;
+                    } else if (process == 5) {
+                        stn.firstscan = true;
+                        stn.PreviousCard = stn.CardInput2.getText();
+                        stn.processRightPanelMsgs(cmp.PrksMsg);
+                        stn.clearLeftMIDMsgPanel();
+                        stn.processRightPanelMsgs(cmp.PrksMsg);
+                        SysMsg[1] = stn.CardInput2.getText();
+                        SysMsg[2] = "Card Still Not Found";
+                        SysMsg[4] = "Input Plate Number";
+                        SysMsg[5] = "then press Enter";
+                        SysMsg[7] = "::Create Manual Card::";
+                        //SysMsg[8] = "P30.00";
+                        //stn.StartInvalidFlatRate();
+                        stn.processRightPanelMsgs(cmp.PrksMsg);
+                        stn.trtype = "R";
+                        //PlateInput2.setText("");
+                        stn.Plateinput.delete(0, stn.Plateinput.length());
+                        stn.PlateInput2.setText("");
+                        return false;
+                    } else if (process == 7) {
+                        //SysMsg[2] = "Card has wrong PARKER TYPE";
+                        //SysMsg[4] = "Please separate card";
+                        SysMsg[2] = "Card has already been paid for";
+                        SysMsg[4] = "Please proceed to Exit";
+                        stn.trtype = "R";
+                        stn.PreviousCard = "";
+                        stn.Cardinput.delete(0, stn.Cardinput.length());
+                        stn.CardInput2.setText("");
+
+                        return false;
+                    } else if (process == 8) {
+                        SysMsg[2] = "Card has wrong Date/Time";
+                        SysMsg[4] = "Please separate card";
+                        stn.trtype = "R";
+                        stn.PreviousCard = "";
+                        stn.Cardinput.delete(0, stn.Cardinput.length());
+                        stn.CardInput2.setText("");
+
+                        return false;
+                    } else if (process == 9) {
+                        SysMsg[2] = "Errors in saving";
+                        SysMsg[3] = "Local Files";
+                        SysMsg[4] = "Please Call Service Engineers";
+                        SysMsg[5] = "immediately";
+                        stn.trtype = "R";
+                        stn.PreviousCard = "";
+                        stn.Cardinput.delete(0, stn.Cardinput.length());
+                        stn.CardInput2.setText("");
+                        return false;
                     }
-                    if (null != buf2) {
-                        Image img = getScaledImage(buf2, screenSize.width / 4 + 100, screenSize.height / 3);
-
-                        stn.exitCamera.setIcon(new ImageIcon(img));
-                        stn.exitCamera.setText("PLATE");
-                    }
-                    //stn.AmtTendered.requestFocus();
-                    return true;
-                } else if (process == 1) {
-                    stn.PreviousCard = "";
-                    stn.clearLeftMIDMsgPanel();
-                    stn.clearRightPanel();
-                    stn.StartComparingCard2DB();
-                    //stn.firstscan = false;
-                    //stn.trtype = "R";
-                    //this.InitiateRescan();
-                    //stn.Cardinput.delete(0, stn.Cardinput.length());
-                    //stn.CardInput2.setText("");
-                    //stn.Plateinput.delete(0, stn.Plateinput.length());
-                    //stn.PlateInput2.setText("");
-                    return false;
-                } else if (process == 4) {
-                    SysMsg[2] = "Card Found";
-                    SysMsg[3] = "Errors";
-                    SysMsg[4] = "Card Unprocessed";
-                    SysMsg[6] = "Please separate card";
-                    stn.trtype = "R";
-                    stn.PreviousCard = "";
-                    stn.Cardinput.delete(0, stn.Cardinput.length());
-                    stn.CardInput2.setText("");
-                    return false;
-                } else if (process == 5) {
-                    stn.firstscan = true;
-                    stn.PreviousCard = stn.CardInput2.getText();
-                    stn.processRightPanelMsgs(cmp.PrksMsg);
-                    stn.clearLeftMIDMsgPanel();
-                    stn.processRightPanelMsgs(cmp.PrksMsg);
-                    SysMsg[1] = stn.CardInput2.getText();
-                    SysMsg[2] = "Card Still Not Found";
-                    SysMsg[4] = "Input Plate Number";
-                    SysMsg[5] = "then press Enter";
-                    SysMsg[7] = "::Create Manual Card::";
-                    //SysMsg[8] = "P30.00";
-                    //stn.StartInvalidFlatRate();
-                    stn.processRightPanelMsgs(cmp.PrksMsg);
-                    stn.trtype = "R";
-                    //PlateInput2.setText("");
-                    stn.Plateinput.delete(0, stn.Plateinput.length());
-                    stn.PlateInput2.setText("");
-                    return false;
-                } else if (process == 7) {
-                    //SysMsg[2] = "Card has wrong PARKER TYPE";
-                    //SysMsg[4] = "Please separate card";
-                    SysMsg[2] = "Card has already been paid for";
-                    SysMsg[4] = "Please proceed to Exit";
-                    stn.trtype = "R";
-                    stn.PreviousCard = "";
-                    stn.Cardinput.delete(0, stn.Cardinput.length());
-                    stn.CardInput2.setText("");
-
-                    return false;
-                } else if (process == 8) {
-                    SysMsg[2] = "Card has wrong Date/Time";
-                    SysMsg[4] = "Please separate card";
-                    stn.trtype = "R";
-                    stn.PreviousCard = "";
-                    stn.Cardinput.delete(0, stn.Cardinput.length());
-                    stn.CardInput2.setText("");
-
-                    return false;
-                } else if (process == 9) {
-                    SysMsg[2] = "Errors in saving";
-                    SysMsg[3] = "Local Files";
-                    SysMsg[4] = "Please Call Service Engineers";
-                    SysMsg[5] = "immediately";
-                    stn.trtype = "R";
-                    stn.PreviousCard = "";
-                    stn.Cardinput.delete(0, stn.Cardinput.length());
-                    stn.CardInput2.setText("");
-                    return false;
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    log.debug(ex);
                 }
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                log.debug(ex);
-            }
 
+            }
         }
         //after processing exit trtrype must be reset to "R"
         stn.trtype = "R";
