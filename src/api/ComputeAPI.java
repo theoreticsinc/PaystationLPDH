@@ -92,7 +92,7 @@ public class ComputeAPI {
     private String printerType;
     private String datamode;
     private String exitType;
-    
+
     public ParkersAPI SP;
 
     public ComputeAPI(HybridPanelUI sui) {
@@ -611,7 +611,7 @@ public class ComputeAPI {
         }
          */
         //----------valid part II---------------
-        DecimalFormat df2 = new DecimalFormat("#.00");            
+        DecimalFormat df2 = new DecimalFormat("#.00");
         String DuplicateReceiptHeader = "";
         ParkersAPI pa = new ParkersAPI();
         int duplicateReceiptType = pa.checkDupReceiptFromPType(ParkerType);
@@ -632,11 +632,11 @@ public class ComputeAPI {
             AmountDue = (vatsale - Float.parseFloat(discount));
             stn.AMOUNTdisplay.setText("P" + String.valueOf(df2.format(AmountDue)));
             updateOneTransFiles("discount", Float.parseFloat(discount));
-            updateOneTransFiles("vatExempt", vatexempt);            
+            updateOneTransFiles("vatExempt", vatexempt);
         }
-            updateOneTransFiles("vat12", vat12);
-            updateOneTransFiles("vatsale", vatsale);   
-            updateOneTransFiles("gross", AmountGross);   
+        updateOneTransFiles("vat12", vat12);
+        updateOneTransFiles("vatsale", vatsale);
+        updateOneTransFiles("gross", AmountGross);
         if (sets == true) {
             ParkerType = stn.trtype;
             DateConversionHandler dch = new DateConversionHandler();
@@ -761,16 +761,16 @@ public class ComputeAPI {
         //String vat12 = getVat(AmountDue);
         //String nonvat = getNonVat(AmountDue);
         tenderFloat = 0f;
-            try {
-                if (stn.AmtTendered.getText().trim().compareToIgnoreCase("") != 0) {
-                    tenderFloat = Float.parseFloat(stn.AmtTendered.getText());
-                } else {
-                    tenderFloat = AmountDue;
-                }
-
-            } catch (Exception x) {
-
+        try {
+            if (stn.AmtTendered.getText().trim().compareToIgnoreCase("") != 0) {
+                tenderFloat = Float.parseFloat(stn.AmtTendered.getText());
+            } else {
+                tenderFloat = AmountDue;
             }
+
+        } catch (Exception x) {
+
+        }
 
         boolean saveParkerTrans = PDH.saveEXParkerTrans2DB(stn.serverIP, stn.EX_SentinelID, transactionNum, Entrypoint, RNos, stn.CashierID, stn.CashierName, Cardno, Plateno, ParkerType, datetimeIN, datetimeOUT, String.valueOf(AmountGross), String.valueOf(AmountDue), HoursElapsed, MinutesElapsed, stn.settlementRef, stn.settlementName, stn.settlementAddr, stn.settlementTIN, stn.settlementBusStyle, vat12, vatsale, vatexempt, discount, tenderFloat, stn.ChangeDisplay.getText());
         if (saveParkerTrans == false) {    //save twice just in case
@@ -1929,7 +1929,7 @@ public class ComputeAPI {
             return false;
         }
     }
-    
+
     private boolean updateOneTransFiles(String fieldName, double Amount) {//Local files
         try {
             SaveCollData scd = new SaveCollData();
@@ -2271,21 +2271,38 @@ public class ComputeAPI {
 
         //i++; //Add 1 to check the next hour because the current hour is already paid 
         //and FractionThereOf takes the next Hour instead of the last
-
-        //FractionThereOf
-        //Must Add the HRplus
-        if (FractionThereOf || MinutesElapsed > 0) {
-            if (HRplusWaived1st[i] == false) {
-                if (HRplus[i].trim().substring(0, 1).compareToIgnoreCase("+") == 0) {
-                    if (i == 3) { 
-                        AmountComputed = AmountComputed + Float.parseFloat(HRplus[i].trim().substring(1));
-                    } else if (i >= 4) { 
-                        AmountComputed = AmountComputed + Float.parseFloat(HR[i].trim().substring(1));
+        for (int x = 0; x <= HoursElapsed; x++) {
+//FractionThereOf
+            //Must Add the HRplus
+            if (x < HoursElapsed) {
+//              if (1 == 1) {
+                if (HRplusWaived1st[x] == false) {
+                    if (HRplus[x].trim().substring(0, 1).compareToIgnoreCase("+") == 0) {
+                        //if (i == 3) { 
+                        AmountComputed = AmountComputed + Float.parseFloat(HRplus[x].trim().substring(1));
+                        //} else if (i >= 4) { 
+                        //    AmountComputed = AmountComputed + Float.parseFloat(HR[i].trim().substring(1));
+                        //}
+                    } else if (HRplus[x].trim().substring(0, 1).compareToIgnoreCase("-") == 0) {
+                        AmountComputed = AmountComputed - Float.parseFloat(HR[x].trim().substring(1));
+                    } else if (HRplus[x].trim().substring(0, 1).compareToIgnoreCase("=") == 0) {
+                        AmountComputed = Float.parseFloat(HR[x].trim().substring(1));
                     }
-                } else if (HRplus[i].trim().substring(0, 1).compareToIgnoreCase("-") == 0) {
-                    AmountComputed = AmountComputed - Float.parseFloat(HR[i].trim().substring(1));
-                } else if (HRplus[i].trim().substring(0, 1).compareToIgnoreCase("=") == 0) {
-                    AmountComputed = Float.parseFloat(HR[i].trim().substring(1));
+                }
+            }
+            if (HoursElapsed == x && MinutesElapsed > 0) {
+                if (HRplusWaived1st[x] == false) {
+                    if (HRplus[x].trim().substring(0, 1).compareToIgnoreCase("+") == 0) {
+                        //if (i == 3) { 
+                        AmountComputed = AmountComputed + Float.parseFloat(HRplus[x].trim().substring(1));
+                        //} else if (i >= 4) { 
+                        //    AmountComputed = AmountComputed + Float.parseFloat(HR[i].trim().substring(1));
+                        //}
+                    } else if (HRplus[x].trim().substring(0, 1).compareToIgnoreCase("-") == 0) {
+                        AmountComputed = AmountComputed - Float.parseFloat(HR[x].trim().substring(1));
+                    } else if (HRplus[x].trim().substring(0, 1).compareToIgnoreCase("=") == 0) {
+                        AmountComputed = Float.parseFloat(HR[x].trim().substring(1));
+                    }
                 }
             }
         }
@@ -2418,8 +2435,8 @@ public class ComputeAPI {
     }
 
     private void TestDiscounts(String ParkerType) {
-        
-        DecimalFormat df2 = new DecimalFormat("#.00");            
+
+        DecimalFormat df2 = new DecimalFormat("#.00");
         String DuplicateReceiptHeader = "";
         ParkersAPI pa = new ParkersAPI();
         int duplicateReceiptType = pa.checkDupReceiptFromPType(ParkerType);
@@ -2429,64 +2446,66 @@ public class ComputeAPI {
         double vatsale = getNonVat(AmountDue);
         String discount = "0.00";
         double vatexempt = 0;
-        
-            if (isDiscounted) {
-                discountPercentage = SP.getdiscountPercentage(ParkerType);
-                discount = getDiscountFromVat(AmountDue, discountPercentage);
-                vat12 = 0;
-                vatsale = 0;
-                vatexempt = getNonVat(AmountDue);
-                AmountDue = (vatexempt - Float.parseFloat(discount));
-                System.out.println("P" + String.valueOf(df2.format(AmountDue)));
-            }
+
+        if (isDiscounted) {
+            discountPercentage = SP.getdiscountPercentage(ParkerType);
+            discount = getDiscountFromVat(AmountDue, discountPercentage);
+            vat12 = 0;
+            vatsale = 0;
+            vatexempt = getNonVat(AmountDue);
+            AmountDue = (vatexempt - Float.parseFloat(discount));
+            System.out.println("P" + String.valueOf(df2.format(AmountDue)));
+        }
     }
-    
+
     public static void main(String args[]) {
         HybridPanelUI stn = new HybridPanelUI();
         ParkersAPI SP = new ParkersAPI();
         
-                SP.setSysID("EN01");
-                SP.setCardID("A82A94B1");
-                SP.setPlateID("AA28934");
-                SP.setTRID("R");
-                SP.setAmountPaid("");
-                
+        String ParkerType = "DI";
+        
+        SP.setSysID("EN01");
+        SP.setCardID("A82A94B1");
+        SP.setPlateID("AA28934");
+        SP.setTRID(ParkerType);
+        SP.setAmountPaid("");
+
         ComputeAPI ca = new ComputeAPI(null);
         ca.SP = SP;
         ca.stn = stn;
         DateConversionHandler dch = new DateConversionHandler();
         dch.convertJavaDate2UnixTime(new Date());
         ca.dateTimeINstamp = new Date().getTime() + "";
-        
+
         Float computed = 0f;
-        
+
         /////GRACE PERIOD
         ca.HoursElapsed = 0;
         ca.MinutesElapsed = 0;
-        computed = ca.Computation("R", true, false);
-        System.out.println("       "+ ca.HoursElapsed  + "Hours : "+ ca.MinutesElapsed  + "Min :== * Amount is: " + computed);
+        computed = ca.Computation(ParkerType, true, false);
+        System.out.println("       " + ca.HoursElapsed + "Hours : " + ca.MinutesElapsed + "Min :== * Amount is: " + computed);
 
         ca.HoursElapsed = 0;
-        ca.MinutesElapsed = 19;
-        computed = ca.Computation("R", true, false);
-        System.out.println("       "+ ca.HoursElapsed  + "Hours : "+ ca.MinutesElapsed  + "Min :== * Amount is: " + computed);
+        ca.MinutesElapsed = 14;
+        computed = ca.Computation(ParkerType, true, false);
+        System.out.println("       " + ca.HoursElapsed + "Hours : " + ca.MinutesElapsed + "Min :== * Amount is: " + computed);
         /////
-        
+
         for (int i = 1; i <= 52; i++) {
             ca.HoursElapsed = i;
             ca.MinutesElapsed = 0;
-            computed = ca.Computation("NQ", true, false);
-            System.out.println("       "+ ca.HoursElapsed  + "Hours : "+ ca.MinutesElapsed  + "Min :== * Amount is: " + computed);
+            computed = ca.Computation(ParkerType, true, false);
+            System.out.println("       " + ca.HoursElapsed + "Hours : " + ca.MinutesElapsed + "Min :== * Amount is: " + computed);
 
-            ca.TestDiscounts("R");
-            
+            ca.TestDiscounts(ParkerType);
+
             ca.HoursElapsed = i;
             ca.MinutesElapsed = 1;
-            computed = ca.Computation("NQ", true, false);
-            System.out.println("       "+ ca.HoursElapsed  + "Hours : "+ ca.MinutesElapsed  + "Min :== * Amount is: " + computed);
+            computed = ca.Computation(ParkerType, true, false);
+            System.out.println("       " + ca.HoursElapsed + "Hours : " + ca.MinutesElapsed + "Min :== * Amount is: " + computed);
 
         }
-        
+
         System.exit(0);
     }
 }
