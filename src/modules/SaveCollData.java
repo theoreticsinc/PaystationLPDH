@@ -11,6 +11,7 @@ import org.apache.log4j.Logger;
 import misc.DataBaseHandler;
 import misc.LogUtility;
 import misc.RawFileHandler;
+import misc.XMLreader;
 
 /**
  *
@@ -25,6 +26,16 @@ public class SaveCollData {
     static Logger log = LogManager.getLogger(SaveCollData.class.getName());
 
     private String loginID;
+    private boolean roundoff2;
+    
+    public SaveCollData() {
+        XMLreader xr = new XMLreader();
+        try {
+            roundoff2 = xr.getElementValue("C://JTerminals/initH.xml", "roundoff2").compareToIgnoreCase("true") == 0;
+        } catch (Exception ex) {
+            log.error(ex.getMessage());
+        }
+    }
         
     public void UpdatePtypecount(String Ftype) {
         try {
@@ -106,7 +117,13 @@ public class SaveCollData {
      public void UpdateImptAmountDB(String fieldName, String logcode, Double data) {
         try {
             double oldAmount = dbh.getImptAmount(fieldName, logcode);
+            if (roundoff2) {
+                oldAmount = Math.round(oldAmount * 100.0) / 100.0;
+            }
             double newAmount = oldAmount + data;
+            if (roundoff2) {
+                newAmount = Math.round(newAmount * 100.0) / 100.0;
+            }
             dbh.setImptAmount(fieldName, logcode, newAmount);
         } catch (Exception ex) {
             log.error(ex.getMessage());
@@ -117,7 +134,13 @@ public class SaveCollData {
         try {
             String ptypeName = dbh.getPtypeName(Ftype);
             double oldAmount = dbh.getPtypeAmount(ptypeName, logcode);
+            if (roundoff2) {
+                oldAmount = Math.round(oldAmount * 100.0) / 100.0;
+            }
             double newAmount = oldAmount + data;
+            if (roundoff2) {
+                newAmount = Math.round(newAmount * 100.0) / 100.0;
+            }
             dbh.setPtypeAmount(ptypeName, logcode, newAmount);
         } catch (Exception ex) {
             log.error(ex.getMessage());
@@ -128,7 +151,13 @@ public class SaveCollData {
         try {
             String ptypeName = Ftype;
             double oldAmount = dbh.getPtypeAmount(ptypeName, logcode);
+            if (roundoff2) {
+                oldAmount = Math.round(oldAmount * 100.0) / 100.0;
+            }
             double newAmount = oldAmount + data;
+            if (roundoff2) {
+                newAmount = Math.round(newAmount * 100.0) / 100.0;
+            }
             dbh.setPtypeAmount(ptypeName, logcode, newAmount);
         } catch (Exception ex) {
             log.error(ex.getMessage());
@@ -139,7 +168,13 @@ public class SaveCollData {
         try {
             String ptypeName = dbh.getPtypeName(Ftype);
             double oldAmount = dbh.getPtypeAmount(ptypeName, logcode);
+            if (roundoff2) {
+                oldAmount = Math.round(oldAmount * 100.0) / 100.0;
+            }
             double newAmount = oldAmount - data;
+            if (roundoff2) {
+                newAmount = Math.round(newAmount * 100.0) / 100.0;
+            }
             dbh.setPtypeAmount(ptypeName, logcode, newAmount);
         } catch (Exception ex) {
             log.error(ex.getMessage());
@@ -252,8 +287,14 @@ public class SaveCollData {
             String curr = rfh.readFline("C://JTerminals/de4Dd87d/CfgJ9rl/", "scrand.jrt", 1);
 
             double newcount = 0;
-            double oldcount = Double.parseDouble(curr);
+            double oldcount = Double.parseDouble(curr);            
+            if (roundoff2) {
+                oldcount = Math.round(oldcount * 100.0) / 100.0;
+            }  
             newcount = oldcount + AmountRCPT;
+            if (roundoff2) {
+                newcount = Math.round(newcount * 100.0) / 100.0;
+            } 
             newcurr = String.valueOf(newcount);
             rfh.putfile("C://JTerminals/de4Dd87d/CfgJ9rl/", "scrand.jrt", newcurr);
         } else {
@@ -280,6 +321,47 @@ public class SaveCollData {
         rfh.putfile("C://JTerminals/FnF/iXyZp12R/", "astrid.jrt", newcurr);
     }
     
+    public String getGRANDGROSSTOTAL() throws IOException {
+        String curr = "";
+        boolean foundfile = rfh.FindFileFolder("C://JTerminals/FnF/iXyZp12R/", "XOG.jrt");
+        if (foundfile == true) {
+            curr = rfh.readFline("C://JTerminals/FnF/iXyZp12R/", "XOG" + ".jrt", 1);
+        } else {
+            curr = "0";
+        }
+        return curr;
+    }
+    
+    public void UpdateGRANDGROSSTOTAL(double AmountRCPT) throws IOException {
+        String newcurr = "";
+        boolean foundfile = rfh.FindFileFolder("C://JTerminals/FnF/iXyZp12R/", "XOG.jrt");
+        if (foundfile == true) {
+            String curr = rfh.readFline("C://JTerminals/FnF/iXyZp12R/", "XOG" + ".jrt", 1);
+
+            double newcount = 0;
+            double oldcount = Double.parseDouble(curr);
+            if (roundoff2) {
+                oldcount = Math.round(oldcount * 100.0) / 100.0;
+            }  
+            newcount = oldcount + AmountRCPT;
+            if (roundoff2) {
+                newcount = Math.round(newcount * 100.0) / 100.0;
+            } 
+            newcurr = String.valueOf(newcount);
+            rfh.putfile("C://JTerminals/FnF/iXyZp12R/", "XOG" + ".jrt", newcurr);
+        } else {
+            newcurr = String.valueOf(AmountRCPT);
+        }
+        rfh.putfile("C://JTerminals/FnF/iXyZp12R/", "XOG" + ".jrt", newcurr);
+//        try {
+//            Process s = Runtime.getRuntime().exec("sudo chmod 777 /JTerminals/FnF/iXyZp12R/XOR.jrt");
+//            s.waitFor();
+//        } catch (InterruptedException ex) {
+//            LogManager.getLogger(SaveCollData.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+
+    }
+    
     public String getGRANDTOTAL() throws IOException {
         String curr = "";
         boolean foundfile = rfh.FindFileFolder("C://JTerminals/FnF/iXyZp12R/", "XOR.jrt");
@@ -299,7 +381,13 @@ public class SaveCollData {
 
             double newcount = 0;
             double oldcount = Double.parseDouble(curr);
+            if (roundoff2) {
+                oldcount = Math.round(oldcount * 100.0) / 100.0;
+            }  
             newcount = oldcount + AmountRCPT;
+            if (roundoff2) {
+                newcount = Math.round(newcount * 100.0) / 100.0;
+            } 
             newcurr = String.valueOf(newcount);
             rfh.putfile("C://JTerminals/FnF/iXyZp12R/", "XOR" + ".jrt", newcurr);
         } else {
@@ -333,7 +421,7 @@ public class SaveCollData {
         }
         return newcurr;
     }
-
+    
     public String getReceiptNos() throws IOException {
         String newReceipt = "";
         boolean foundfile = rfh.FindFileFolder("C://JTerminals/de4Dd87d/CfgJ9rl/", "trent.jrt");
@@ -344,14 +432,59 @@ public class SaveCollData {
                 oldcount = 1;
             }
             newReceipt = String.valueOf(oldcount);
-            int stoploop = 8 - newReceipt.length();
+            int stoploop = 12 - newReceipt.length();
             int i = 0;
             do {
                 newReceipt = "0" + newReceipt;
                 i++;
             } while (i != stoploop);
         } else {
-            newReceipt = "00000000";  //twelve digits
+            newReceipt = "000000000000";  //twelve digits
+        }
+        return newReceipt;
+    }
+    
+    public String getNextReceiptNos() throws IOException {
+        String newReceipt = "";
+        boolean foundfile = rfh.FindFileFolder("C://JTerminals/de4Dd87d/CfgJ9rl/", "trent.jrt");
+        if (foundfile == true) {
+            String curr = rfh.readFline("C://JTerminals/de4Dd87d/CfgJ9rl/", "trent.jrt", 1);
+            int oldcount = Integer.parseInt(curr) + 1;
+            if (oldcount == 0) {
+                oldcount = 1;
+            }
+            newReceipt = String.valueOf(oldcount);
+            int stoploop = 12 - newReceipt.length();
+            int i = 0;
+            do {
+                newReceipt = "0" + newReceipt;
+                i++;
+            } while (i != stoploop);
+        } else {
+            newReceipt = "000000000000";  //twelve digits
+        }
+        return newReceipt;
+    }
+
+    public String getGeneratedReceiptNos() throws IOException {
+        String newReceipt = "";
+        boolean foundfile = rfh.FindFileFolder("C://JTerminals/de4Dd87d/CfgJ9rl/", "trent.jrt");
+        if (foundfile == true) {
+            String curr = rfh.readFline("C://JTerminals/de4Dd87d/CfgJ9rl/", "trent.jrt", 1);
+            int oldcount = Integer.parseInt(curr);
+            if (oldcount <= 0) {
+                //oldcount = 1;
+                oldcount = 0;
+            }
+            newReceipt = String.valueOf(oldcount);
+            int stoploop = 12 - newReceipt.length();
+            int i = 0;
+            do {
+                newReceipt = "0" + newReceipt;
+                i++;
+            } while (i != stoploop);
+        } else {
+            newReceipt = "000000000000";  //twelve digits
         }
         return newReceipt;
     }
@@ -422,10 +555,11 @@ public class SaveCollData {
 
     public void saveZRead(String logID, String Exitpoint, String lastTransaction, String logcode) {
         try {
-            String receiptNos = getReceiptNos();
+            String receiptNos = getNextReceiptNos();
             String grandTotal = getGRANDTOTAL();
+            String grandGrossTotal = getGRANDGROSSTOTAL();
             //String transaction = dbh.getTransactionNos();
-            dbh.saveZReadLogIn(logID, Exitpoint, receiptNos, grandTotal, lastTransaction, logcode);
+            dbh.saveZReadLogIn(logID, Exitpoint, receiptNos, grandTotal, grandGrossTotal, lastTransaction, logcode);
         } catch (IOException ex) {
             ex.printStackTrace();
             log.error(ex.getMessage());
@@ -433,11 +567,22 @@ public class SaveCollData {
     }
     
     
-    public void updateZRead(String logID, String Exitpoint, String lastTransaction, String logcode, String totalAmount, String vatSale, String vat12Sale, String vatExempt, String discounts) {
+    public void updateZRead(String logID, String Exitpoint, String lastTransaction, String logcode, String totalAmount, String grossAmount, String vatSale, String vat12Sale, String vatExemptedSales, String discounts, String voidsCollected) {
         try {
-            String endingReceiptNos = getReceiptNos();
+            String endingReceiptNos = getGeneratedReceiptNos();
             String endingGrandTotal = getGRANDTOTAL();
-            //String transaction = dbh.getTransactionNos();
+
+            String endingGrandGrossTotal = getGRANDGROSSTOTAL();
+            boolean wasReceiptGenerated = dbh.wasReceiptGenerated(logID, endingReceiptNos);
+            //if (endingReceiptNos.compareTo("000000000001") == 0) {
+            //    dbh.saveZReadLogOut(logID, Exitpoint, endingReceiptNos, endingGrandTotal, endingGrandGrossTotal, lastTransaction, logcode, totalAmount, grossAmount, vatSale, vat12Sale, vatExemptedSales, discounts, voidsCollected);
+            //}
+            if (wasReceiptGenerated) {
+                dbh.saveZReadLogOut(logID, Exitpoint, endingReceiptNos, endingGrandTotal, endingGrandGrossTotal, lastTransaction, logcode, totalAmount, grossAmount, vatSale, vat12Sale, vatExemptedSales, discounts, voidsCollected);
+            } else {
+                dbh.saveZReadLogOut(logID, Exitpoint, "000000000000", "000000000000", endingGrandTotal, endingGrandGrossTotal, lastTransaction, logcode, totalAmount, grossAmount, vatSale, vat12Sale, vatExemptedSales, discounts, voidsCollected);
+            }
+            
         } catch (IOException ex) {
             ex.printStackTrace();
             log.error(ex.getMessage());
@@ -445,7 +590,7 @@ public class SaveCollData {
     }
     
     public String formatNos(String newReceipt) {
-        int stoploop = 10 - newReceipt.length();
+        int stoploop = 12 - newReceipt.length();
         int i = 0;
         do {
             newReceipt = "0" + newReceipt;

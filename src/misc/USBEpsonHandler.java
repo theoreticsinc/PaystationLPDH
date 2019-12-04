@@ -78,6 +78,18 @@ public class USBEpsonHandler {
             log.error(ex.getMessage());
         }
     }
+    
+    public void kickDrawer() {
+        try {
+            
+            byte[] kick = new byte[] { 0x1b, 0x70, 0x00, 0x50, 0x60 };
+            printerService.printBytes(printerName, kick);
+            
+        } catch (Exception ex) {
+            log.error(ex.getMessage());
+        }
+    }
+
 
     public void printTestHEADER() {
         try {
@@ -124,7 +136,7 @@ public class USBEpsonHandler {
             this.setRed();
             this.Justify((byte) 1);
             //this.feedpaperup((byte)1);
-/*            
+          
             if(headerline1PrintEnabled.compareToIgnoreCase("enabled") == 0) {
                 this.printline(headerline1);
             }
@@ -168,15 +180,15 @@ public class USBEpsonHandler {
             this.startPrinter();
             //bos.write(13);
             //bos.close();
-*/
-            this.printline(" CHINESE GENERAL HOSPITAL & MEDICAL CTR");
-            this.printline("  286 BLUMENTRITT ST. STA. CRUZ MANILA");
-            this.printline(" PERMIT : 0813-031-162959-000(08/1/2013)");
-            this.printline("           TIN# 000-328-853-000");
-            this.printline("     SW-ACCR : 042-006539714-000504");
-            this.printline("             MS# : 130325653");
-            this.printline("             Terminal : POS-2");
-            this.printline("---------------------------------------");
+
+//            this.printline(" CHINESE GENERAL HOSPITAL & MEDICAL CTR");
+//            this.printline("  286 BLUMENTRITT ST. STA. CRUZ MANILA");
+//            this.printline(" PERMIT : 0813-031-162959-000(08/1/2013)");
+//            this.printline("           TIN# 000-328-853-000");
+//            this.printline("     SW-ACCR : 042-006539714-000504");
+//            this.printline("             MS# : 130325653");
+//            this.printline("             Terminal : POS-2");
+//            this.printline("---------------------------------------");
             this.Justify((byte) 0);
         } catch (Exception ex) {
             log.error(ex.getMessage());
@@ -208,27 +220,20 @@ public class USBEpsonHandler {
             String FooterEnabled = xr.getElementValue("C://JTerminals/initH.xml", "footer");
             String BIRFooterEnabled = xr.getElementValue("C://JTerminals/initH.xml", "BIRfooter");
             
-            /*
+            this.Justify((byte) 1);
             if (FooterEnabled.compareToIgnoreCase("enabled") == 0) {
                 this.printline("POS Provider:");
                 this.printline("Applied Modern Theoretics Inc.");
                 this.printline("5F Builders Center Bldg.");
                 this.printline("Salcedo Street Legaspi Village");
                 this.printline("Makati Philippines");
+                this.printline("VAT Reg TIN : 008-398-874-00000");
                 this.startPrinter();
             }
-            */
             this.setBlack();
-            this.Justify((byte) 1);
-                this.printline("This Serves as your Official Receipt");
-                this.printline("THIS RECEIPT SHALL BE VALID FOR FIVE(5)");
-                this.printline("YEARS FROM THE DATE OF THE PERMIT TO USE");
-//                this.printline("     THIS DOCUMENT IS NOT VALID");
-//                this.printline("       FOR CLAIM OF INPUT TAX");
-                //this.startPrinter();
-            
+             
             this.setRed();
-/*            
+            
             if(footerline1PrintEnabled.compareToIgnoreCase("enabled") == 0) {
                 this.printline(footerline1);
             }
@@ -259,9 +264,16 @@ public class USBEpsonHandler {
             if(footerline10PrintEnabled.compareToIgnoreCase("enabled") == 0) {
                 this.printline(footerline10);
             }
-*/            
+           
+                this.printline("This Serves as your OFFICIAL RECEIPT");
+                this.printline("THIS RECEIPT SHALL BE VALID FOR FIVE(5)");
+                this.printline("YEARS FROM THE DATE OF THE PERMIT TO USE");
+//                this.printline("     THIS DOCUMENT IS NOT VALID");
+//                this.printline("       FOR CLAIM OF INPUT TAX");
+                //this.startPrinter();           
+            this.startPrinter();            
             this.Justify((byte) 0);
-            this.startPrinter();
+            
         } catch (Exception ex) {
             log.error(ex.getMessage());
         }
@@ -635,8 +647,8 @@ public class USBEpsonHandler {
     }
     
     public void setRed() {
-        //byte[] red = new byte[] { 0x1b, 0x72, 0x01 };
-        byte[] red = new byte[] { 0x1b, 0x72, 0x00 };
+        byte[] red = new byte[] { 0x1b, 0x72, 0x01 };
+//        byte[] red = new byte[] { 0x1b, 0x72, 0x00 };
         printerService.printBytes(printerName, red);
     }
     
@@ -654,7 +666,8 @@ public class USBEpsonHandler {
 
     public static void main(String[] args) {
         USBEpsonHandler ea = new USBEpsonHandler();
-        ea.usbPrintTest();
+        //ea.usbPrintTest();
+        ea.kickDrawer();
     }
 
     public static void mainOld(String[] args) {

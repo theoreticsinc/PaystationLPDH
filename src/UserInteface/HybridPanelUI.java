@@ -78,6 +78,7 @@ public class HybridPanelUI extends javax.swing.JFrame implements WindowFocusList
     public boolean debugMode = false;
     private boolean altIsPressed = false;
     String switchmode = null;
+    public boolean scanEXTCRD = false;
     String bundleName = "mapping.idproperties";
     ResourceBundle myResources = ResourceBundle.getBundle(bundleName, Locale.getDefault());
     static Logger log = LogManager.getLogger(HybridPanelUI.class.getName());
@@ -150,7 +151,7 @@ public class HybridPanelUI extends javax.swing.JFrame implements WindowFocusList
     public String loginID;
     public String serverIP, key;
     public String BackupMainServer, printer, printerType, slotsmode, SlotsResetEnabled, sResetTime;
-    public String payuponentry;
+    public String payuponentry, exitType;
     public boolean slotscompute = false;
     public Date busyStamp = new Date();
     public Date SavedStamp = new Date();
@@ -291,6 +292,7 @@ public class HybridPanelUI extends javax.swing.JFrame implements WindowFocusList
             TerminalType = xr.getAttributeValue("C://JTerminals/initH.xml", "terminal_id", "type");
             EN_SentinelID = xr.getElementValue("C://JTerminals/initH.xml", "HNterminal_id");
             EX_SentinelID = xr.getElementValue("C://JTerminals/initH.xml", "HXterminal_id");
+            exitType = xr.getElementValue("C://JTerminals/initH.xml", "exitType");
             ParkingArea = xr.getElementValue("C://JTerminals/initH.xml", "area_id");
             SlotsID = xr.getElementValue("C://JTerminals/initH.xml", "slots_id");
             serverIP = xr.getElementValue("C://JTerminals/initH.xml", "server_ip");
@@ -477,9 +479,9 @@ public class HybridPanelUI extends javax.swing.JFrame implements WindowFocusList
         SlotsComputer sc = new SlotsComputer(slotscompute);
         ThrSlotsClock = new Thread(sc);
         ThrSlotsClock.start();
-        //ShowExitCamera sec = new ShowExitCamera();
-        //ThrShowExitCamera = new Thread(sec);
-        //ThrShowExitCamera.start();
+        ShowExitCamera sec = new ShowExitCamera();
+        ThrShowExitCamera = new Thread(sec);
+        ThrShowExitCamera.start();
         //OnlineQuickUpdater qc = new OnlineQuickUpdater();
         //ThrQuickUpdaterClock = new Thread(qc);
         //ThrQuickUpdaterClock.start();
@@ -549,6 +551,16 @@ public class HybridPanelUI extends javax.swing.JFrame implements WindowFocusList
         XFunc4 = new javax.swing.JLabel();
         XFunc2 = new javax.swing.JLabel();
         spacer = new javax.swing.JLabel();
+        slotsPanel = new javax.swing.JPanel();
+        slotsType = new javax.swing.JLabel();
+        carsMinusbtn = new javax.swing.JLabel();
+        carsNum = new javax.swing.JTextField();
+        carsPlusbtn = new javax.swing.JLabel();
+        sep = new javax.swing.JLabel();
+        slotsType2 = new javax.swing.JLabel();
+        motorMinusbtn = new javax.swing.JLabel();
+        motorNum = new javax.swing.JTextField();
+        motorPlusbtn = new javax.swing.JLabel();
         fullScreenCamera = new javax.swing.JLabel();
         ManualEntryPanel = new javax.swing.JPanel();
         closeButton1 = new javax.swing.JButton();
@@ -590,7 +602,6 @@ public class HybridPanelUI extends javax.swing.JFrame implements WindowFocusList
         MasterCardPanel = new javax.swing.JPanel();
         MasterCardLbl = new javax.swing.JLabel();
         MasterCardInput2 = new javax.swing.JLabel();
-        reprintButton = new javax.swing.JButton();
         BGPanel = new javax.swing.JPanel();
         NorthPanel = new javax.swing.JPanel();
         ProductName = new javax.swing.JLabel();
@@ -602,16 +613,6 @@ public class HybridPanelUI extends javax.swing.JFrame implements WindowFocusList
         Status = new javax.swing.JPanel();
         ServerStatus = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
-        slotsPanel = new javax.swing.JPanel();
-        slotsType = new javax.swing.JLabel();
-        carsMinusbtn = new javax.swing.JLabel();
-        carsNum = new javax.swing.JTextField();
-        carsPlusbtn = new javax.swing.JLabel();
-        sep = new javax.swing.JLabel();
-        slotsType2 = new javax.swing.JLabel();
-        motorMinusbtn = new javax.swing.JLabel();
-        motorNum = new javax.swing.JTextField();
-        motorPlusbtn = new javax.swing.JLabel();
         SouthPanel = new javax.swing.JPanel();
         version = new javax.swing.JLabel();
         RDatePanel = new javax.swing.JPanel();
@@ -1281,6 +1282,76 @@ public class HybridPanelUI extends javax.swing.JFrame implements WindowFocusList
         spacer.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         spacer.setIcon(new javax.swing.ImageIcon(getClass().getResource("/hybrid/resources/logo.png"))); // NOI18N
 
+        slotsPanel.setEnabled(false);
+        slotsPanel.setOpaque(false);
+
+        slotsType.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        slotsType.setForeground(new java.awt.Color(255, 255, 255));
+        slotsType.setText("CARS");
+        slotsPanel.add(slotsType);
+
+        carsMinusbtn.setIcon(new javax.swing.ImageIcon(getClass().getResource("/hybrid/resources/buttonMinus1.png"))); // NOI18N
+        carsMinusbtn.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                carsMinusbtnMouseClicked(evt);
+            }
+        });
+        slotsPanel.add(carsMinusbtn);
+
+        carsNum.setEditable(false);
+        carsNum.setHorizontalAlignment(javax.swing.JTextField.LEFT);
+        carsNum.setText("120");
+        carsNum.setBackground(new java.awt.Color(0, 0, 0));
+        carsNum.setFont(new java.awt.Font("DSEG14 Modern", 0, 24)); // NOI18N
+        carsNum.setForeground(new java.awt.Color(255, 255, 255));
+        carsNum.setMargin(new java.awt.Insets(10, 10, 10, 10));
+        carsNum.setMinimumSize(new java.awt.Dimension(76, 76));
+        carsNum.setName(""); // NOI18N
+        slotsPanel.add(carsNum);
+
+        carsPlusbtn.setIcon(new javax.swing.ImageIcon(getClass().getResource("/hybrid/resources/buttonPlus1.png"))); // NOI18N
+        carsPlusbtn.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                carsPlusbtnMouseClicked(evt);
+            }
+        });
+        slotsPanel.add(carsPlusbtn);
+
+        sep.setText("                        ");
+        slotsPanel.add(sep);
+
+        slotsType2.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        slotsType2.setForeground(new java.awt.Color(255, 255, 255));
+        slotsType2.setText("Motorcycle");
+        slotsPanel.add(slotsType2);
+
+        motorMinusbtn.setIcon(new javax.swing.ImageIcon(getClass().getResource("/hybrid/resources/buttonMinus1.png"))); // NOI18N
+        motorMinusbtn.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                motorMinusbtnMouseClicked(evt);
+            }
+        });
+        slotsPanel.add(motorMinusbtn);
+
+        motorNum.setEditable(false);
+        motorNum.setHorizontalAlignment(javax.swing.JTextField.LEFT);
+        motorNum.setText("120");
+        motorNum.setBackground(new java.awt.Color(0, 0, 0));
+        motorNum.setFont(new java.awt.Font("DSEG14 Modern", 0, 24)); // NOI18N
+        motorNum.setForeground(new java.awt.Color(255, 255, 255));
+        motorNum.setMargin(new java.awt.Insets(10, 10, 10, 10));
+        motorNum.setMinimumSize(new java.awt.Dimension(76, 76));
+        motorNum.setName(""); // NOI18N
+        slotsPanel.add(motorNum);
+
+        motorPlusbtn.setIcon(new javax.swing.ImageIcon(getClass().getResource("/hybrid/resources/buttonPlus1.png"))); // NOI18N
+        motorPlusbtn.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                motorPlusbtnMouseClicked(evt);
+            }
+        });
+        slotsPanel.add(motorPlusbtn);
+
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setBackground(new java.awt.Color(255, 255, 255));
         setForeground(java.awt.Color.white);
@@ -1568,14 +1639,6 @@ public class HybridPanelUI extends javax.swing.JFrame implements WindowFocusList
         MasterCardInput2.setOpaque(true);
         MasterCardPanel.add(MasterCardInput2);
 
-        reprintButton.setText("Reprint X Read");
-        reprintButton.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mousePressed(java.awt.event.MouseEvent evt) {
-                reprintButtonMousePressed(evt);
-            }
-        });
-        MasterCardPanel.add(reprintButton);
-
         getContentPane().add(MasterCardPanel);
         MasterCardPanel.setBounds(480, 350, 310, 60);
 
@@ -1585,15 +1648,12 @@ public class HybridPanelUI extends javax.swing.JFrame implements WindowFocusList
         NorthPanel.setOpaque(false);
         NorthPanel.setLayout(new java.awt.BorderLayout());
 
-        ProductName.setIcon(new javax.swing.ImageIcon(getClass().getResource("/hybrid/resources/small SilverLogo.png"))); // NOI18N
-        ProductName.setText("PARKING AREA SENTINEL SYSTEM");
         ProductName.setFont(new java.awt.Font("Calibri", 1, 14)); // NOI18N
         ProductName.setForeground(new java.awt.Color(255, 255, 255));
         NorthPanel.add(ProductName, java.awt.BorderLayout.WEST);
         ProductName.getAccessibleContext().setAccessibleName("PARKING AREA SENTINEL SYSTEM\nTheoretics Inc");
 
         ClientName.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        ClientName.setText("WELCOME TO PAYSTATION PARKING");
         ClientName.setFont(new java.awt.Font("Calibri", 1, 24)); // NOI18N
         ClientName.setForeground(new java.awt.Color(255, 255, 255));
         NorthPanel.add(ClientName, java.awt.BorderLayout.NORTH);
@@ -1614,9 +1674,6 @@ public class HybridPanelUI extends javax.swing.JFrame implements WindowFocusList
         Labels.add(ServerInfo1);
 
         jLabel2.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel2.setText("created by");
-        jLabel2.setMinimumSize(null);
-        jLabel2.setPreferredSize(null);
         Labels.add(jLabel2);
 
         LeftMsgPanel.add(Labels);
@@ -1634,7 +1691,6 @@ public class HybridPanelUI extends javax.swing.JFrame implements WindowFocusList
         Status.add(ServerStatus);
 
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setText("THEORETICS INC.");
         jLabel1.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(255, 255, 255));
         jLabel1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -1646,83 +1702,12 @@ public class HybridPanelUI extends javax.swing.JFrame implements WindowFocusList
 
         NorthPanel.add(LeftMsgPanel, java.awt.BorderLayout.EAST);
 
-        slotsPanel.setOpaque(false);
-
-        slotsType.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
-        slotsType.setForeground(new java.awt.Color(255, 255, 255));
-        slotsType.setText("CARS");
-        slotsPanel.add(slotsType);
-
-        carsMinusbtn.setIcon(new javax.swing.ImageIcon(getClass().getResource("/hybrid/resources/buttonMinus1.png"))); // NOI18N
-        carsMinusbtn.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                carsMinusbtnMouseClicked(evt);
-            }
-        });
-        slotsPanel.add(carsMinusbtn);
-
-        carsNum.setEditable(false);
-        carsNum.setHorizontalAlignment(javax.swing.JTextField.LEFT);
-        carsNum.setText("120");
-        carsNum.setBackground(new java.awt.Color(0, 0, 0));
-        carsNum.setFont(new java.awt.Font("DSEG14 Modern", 0, 24)); // NOI18N
-        carsNum.setForeground(new java.awt.Color(255, 255, 255));
-        carsNum.setMargin(new java.awt.Insets(10, 10, 10, 10));
-        carsNum.setMinimumSize(new java.awt.Dimension(76, 76));
-        carsNum.setName(""); // NOI18N
-        slotsPanel.add(carsNum);
-
-        carsPlusbtn.setIcon(new javax.swing.ImageIcon(getClass().getResource("/hybrid/resources/buttonPlus1.png"))); // NOI18N
-        carsPlusbtn.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                carsPlusbtnMouseClicked(evt);
-            }
-        });
-        slotsPanel.add(carsPlusbtn);
-
-        sep.setText("                        ");
-        slotsPanel.add(sep);
-
-        slotsType2.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
-        slotsType2.setForeground(new java.awt.Color(255, 255, 255));
-        slotsType2.setText("Motorcycle");
-        slotsPanel.add(slotsType2);
-
-        motorMinusbtn.setIcon(new javax.swing.ImageIcon(getClass().getResource("/hybrid/resources/buttonMinus1.png"))); // NOI18N
-        motorMinusbtn.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                motorMinusbtnMouseClicked(evt);
-            }
-        });
-        slotsPanel.add(motorMinusbtn);
-
-        motorNum.setEditable(false);
-        motorNum.setHorizontalAlignment(javax.swing.JTextField.LEFT);
-        motorNum.setText("120");
-        motorNum.setBackground(new java.awt.Color(0, 0, 0));
-        motorNum.setFont(new java.awt.Font("DSEG14 Modern", 0, 24)); // NOI18N
-        motorNum.setForeground(new java.awt.Color(255, 255, 255));
-        motorNum.setMargin(new java.awt.Insets(10, 10, 10, 10));
-        motorNum.setMinimumSize(new java.awt.Dimension(76, 76));
-        motorNum.setName(""); // NOI18N
-        slotsPanel.add(motorNum);
-
-        motorPlusbtn.setIcon(new javax.swing.ImageIcon(getClass().getResource("/hybrid/resources/buttonPlus1.png"))); // NOI18N
-        motorPlusbtn.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                motorPlusbtnMouseClicked(evt);
-            }
-        });
-        slotsPanel.add(motorPlusbtn);
-
-        NorthPanel.add(slotsPanel, java.awt.BorderLayout.CENTER);
-
         BGPanel.add(NorthPanel, java.awt.BorderLayout.NORTH);
 
         SouthPanel.setOpaque(false);
         SouthPanel.setLayout(new java.awt.BorderLayout());
 
-        version.setIcon(new javax.swing.ImageIcon(getClass().getResource("/hybrid/resources/startButton.PNG"))); // NOI18N
+        version.setIcon(new javax.swing.ImageIcon(getClass().getResource("/hybrid/resources/qwerty.png"))); // NOI18N
         version.setText("V *"); // NOI18N
         version.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
         version.setFocusable(false);
@@ -1794,7 +1779,7 @@ public class HybridPanelUI extends javax.swing.JFrame implements WindowFocusList
         RDatePanel1.setLayout(new java.awt.GridLayout(1, 2));
         RDatePanel1.add(spacer4);
 
-        SentinelIDlbl.setText("Sentinel ID:"); // NOI18N
+        SentinelIDlbl.setText("Exit ID:"); // NOI18N
         SentinelIDlbl.setBackground(new java.awt.Color(255, 255, 200));
         SentinelIDlbl.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
         SentinelIDlbl.setFont(new java.awt.Font("Arial", 1, 18)); // NOI18N
@@ -1928,6 +1913,7 @@ public class HybridPanelUI extends javax.swing.JFrame implements WindowFocusList
         ChangeDisplay.setFocusable(false);
         ChangeDisplay.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
         ChangeDisplay.setForeground(new java.awt.Color(255, 255, 204));
+        ChangeDisplay.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         ChangeDisplay.setRequestFocusEnabled(false);
         ChangeDisplay.setVerifyInputWhenFocusTarget(false);
         MainPanel.add(ChangeDisplay);
@@ -2572,8 +2558,8 @@ public class HybridPanelUI extends javax.swing.JFrame implements WindowFocusList
 
         jScrollPane1.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
 
-        jList1.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         jList1.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        jList1.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         jScrollPane1.setViewportView(jList1);
 
         ReprintPanel.add(jScrollPane1);
@@ -4055,7 +4041,7 @@ public class HybridPanelUI extends javax.swing.JFrame implements WindowFocusList
         BGPanel.add(EastPanel, java.awt.BorderLayout.EAST);
 
         getContentPane().add(BGPanel);
-        BGPanel.setBounds(0, 0, 1430, 870);
+        BGPanel.setBounds(0, 0, 1430, 804);
 
         CamPanel.setFocusable(false);
         CamPanel.setRequestFocusEnabled(false);
@@ -4845,6 +4831,7 @@ private void ENTERManualEnter(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_
                 return blank[i];
             }
         });
+        ReprintPanel.setVisible(false);
     }//GEN-LAST:event_reprintOutMousePressed
 
     private void LoginButton1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_LoginButton1MouseClicked
@@ -5170,12 +5157,6 @@ private void ENTERManualEnter(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_
         manualEntryTime.setTimeToNow();
     }//GEN-LAST:event_XFunc12MouseClicked
 
-    private void reprintButtonMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_reprintButtonMousePressed
-        MasterCardPanel.setVisible(false);
-        MainFuncPad.setVisible(false);
-        SecretFuncPad.setVisible(true);
-    }//GEN-LAST:event_reprintButtonMousePressed
-
     private void OverrideSwitch_set2Exit(boolean setExit) {
 //        this.clearLeftMIDMsgPanel();
 //        this.clearRightPanel(); 
@@ -5461,17 +5442,19 @@ private void ENTERManualEnter(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_
                     //lm.saveLogintoFile(logname, LogUsercode2.getText());
                     lm.printLoginUSBSTUB(logStamp, LogUsercode2.getText(), logname, EX_SentinelID);
                     dbh.saveLog("L1", LogUsercode2.getText());
-                    lm.saveLogintoFile(logStamp, logID, LogUsercode2.getText(), logname);
                     currentmode = "";
-                    //REFRESH
-                    this.loginID = logID;
-                    this.startEntranceTransacting();
+                    //REFRESH                    
                     String lastTransaction = dbh.getLastTransaction(EX_SentinelID);
                     if (null == lastTransaction) {
+                        lastTransaction = "0000000000000001";
+                    } else if (lastTransaction.compareTo("0000000000000002") == 0) {
                         lastTransaction = "0000000000000001";
                     }
                     dbh.saveLogin(logID, CashierID, logname, EX_SentinelID);
                     scd.saveZRead(logID, EX_SentinelID, lastTransaction, LogUsercode2.getText());
+                    this.loginID = logID;
+                    this.startEntranceTransacting();
+                    lm.saveLogintoFile(logStamp, logID, LogUsercode2.getText(), logname);                    
                 }
 
                 CashierName = lm.getCashierName();
@@ -5737,13 +5720,9 @@ private void ENTERManualEnter(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_
                 //lm.printLogoutReceiptFromDB(EX_SentinelID, false);
                 lm.printHEADER(EX_SentinelID);
                 lm.epsonPrintLogoutReceiptFromDB(EX_SentinelID, false);
+                
                 //---------------------------
-                lm.saveLogintoFile(logStamp, "", "", "");
-                SysMessage1.setText("LOGOUT Successful");
-                SysMessage3.setText("LOGCODE Found");
-                SysMessage4.setText("-Please Login again-");
-                Loginput.delete(0, Loginput.length());
-
+                
                 LogUsercode1.setText("");
                 LogPassword1.setText("");
                 LogUsercode2.setText("");
@@ -5755,16 +5734,19 @@ private void ENTERManualEnter(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_
                 CashierName = "";
                 //String logID, String Exitpoint, String lastTransaction, String logcode                
                 String lastTransaction = dbh.getLastTransaction(EX_SentinelID);
+                Float grossCollected = dbh.getImptAmount("grossAmount", loginID);
                 Float totalCollected = dbh.getImptAmount("totalAmount", loginID);
                 Float discountCollected = dbh.getImptAmount("discountAmount", loginID);
                 Float vatsaleAmount = dbh.getImptAmount("vatsaleAmount", loginID);
                 Float vat12Amount = dbh.getImptAmount("vat12Amount", loginID);
-                Float vatExemptAmount = dbh.getImptAmount("vatExemptAmount", loginID);                
+                Float vatExemptedSalesAmount = dbh.getImptAmount("vatExemptedSalesAmount", loginID);                
+                //Float voidsCollected = dbh.getImptAmount("voidsAmount", loginID);
+                Float voidsCollected = 0f;
                 
                 //Double Sale12Vat = (double) totalCollected * 0.12;
                 //Double Sale12Vat = (double) (totalCollected / 1.12) * 0.12f;
                 //Double vatSale = totalCollected - Sale12Vat;
-                scd.updateZRead(loginID, EX_SentinelID, lastTransaction, compcode, String.valueOf(totalCollected), String.valueOf(vatsaleAmount), String.valueOf(vat12Amount), String.valueOf(vatExemptAmount), String.valueOf(discountCollected));
+                scd.updateZRead(loginID, EX_SentinelID, lastTransaction, compcode, String.valueOf(totalCollected), String.valueOf(grossCollected), String.valueOf(vatsaleAmount), String.valueOf(vat12Amount), String.valueOf(vatExemptedSalesAmount), String.valueOf(discountCollected), String.valueOf(voidsCollected));
                 scd.ResetCarServed();
                 scd.ResetExitCarServed();
                 scd.ResetEntryTicketsServed();
@@ -5775,7 +5757,14 @@ private void ENTERManualEnter(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_
                 ExitTickets.setText(scd.getExitTicketsServed());
                 LoginMOD la = new LoginMOD();
                 la.CheckValidCashierStamp(this);
+                
+                SysMessage1.setText("LOGOUT Successful");
+                SysMessage3.setText("LOGCODE Found");
+                SysMessage4.setText("-Please Login again-");
+                Loginput.delete(0, Loginput.length());
+                
                 this.StartLogInX();
+                lm.saveLogintoFile(logStamp, "", "", "");
                 return true;
             } else {//reset codeinputbox
                 LogUsercode1.setText("");
@@ -7368,7 +7357,6 @@ private void ENTERManualEnter(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_
     private javax.swing.JButton refundBtn;
     private javax.swing.JButton refundOut;
     private javax.swing.JButton reprintBtn;
-    private javax.swing.JButton reprintButton;
     private javax.swing.JLabel reprintLbl1;
     private javax.swing.JLabel reprintLbl2;
     private javax.swing.JButton reprintOut;
@@ -7536,7 +7524,8 @@ private void ENTERManualEnter(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_
             modal = true;
         } else if (InvalidFlatRate == true) {
             ExitAPI ea = new ExitAPI(this);
-            PreviousCard = CardInput2.getText();
+            PreviousCard = Cardinput.toString();
+            //PreviousCard = CardInput2.getText();
             if (ea.InitiateInvalids() == true) {
                 this.repaint();
                 this.validate();
@@ -7600,9 +7589,10 @@ private void ENTERManualEnter(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_
 //            if (PrinterEnabled == true) {
         //if (isEnterPressed == true || PrevPlate.compareToIgnoreCase(Plateinput.toString()) != 0 ) {
             //PrevPlate = Plateinput.toString();
-            if (PreviousCard.compareToIgnoreCase(Cardinput.toString()) != 0) {
+            if (PreviousCard.compareToIgnoreCase(Cardinput.toString()) != 0 || scanEXTCRD == true) {
                 //********This prevents from scanning the card again.
-                PreviousCard = CardInput2.getText();  //Uncomment if you want to Recheck the CARD upon exit
+                PreviousCard = Cardinput.toString();
+                //PreviousCard = CardInput2.getText();  //Uncomment if you want to Recheck the CARD upon exit
                 //This is for Paystation Only 
                 //if (this.Plateinput.length() >= 6) {
                 //    this.PlateInput2.setText(Plateinput.toString());
@@ -7614,12 +7604,15 @@ private void ENTERManualEnter(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_
                     //                           if(ThrDisplayPole.isInterrupted()==false)
                     //                           {ThrDisplayPole.yield();
                     //                            ThrDisplayPole.interrupt();}
-
+                    USBEpsonHandler eh = new USBEpsonHandler();
+                    eh.kickDrawer();        
                     Thread xit = new Thread(ea);
                     xit.setPriority(1);
                     xit.start();
                     resetAllOverrides();
-                    //                        ea.ValidPartII();
+                    if (scanEXTCRD) {
+                        ea.ValidPartII();
+                    }                   
                     this.resetAllOverrides();
                     firstscan = true;
                 }

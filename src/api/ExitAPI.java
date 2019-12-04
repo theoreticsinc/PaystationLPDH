@@ -61,7 +61,7 @@ public class ExitAPI implements Runnable {
                 stn.SysMessage11.setText("*** VIP CARD HOLDER ***");
                 stn.SysMessage13.setText("Card Number: " + vChkr.vipNumber);
                 stn.SysMessage14.setText("VIP NAME : " + vChkr.vipName);
-                stn.SysMessage16.setText("Expiration Date: " + vChkr.expDate);                
+                stn.SysMessage16.setText("Expiration Date: " + vChkr.expDate);
             }
             if (null == vChkr.expDate || vChkr.expDate.before(NowStamp)) {
                 vChkr.vipNumber = null;
@@ -126,7 +126,8 @@ public class ExitAPI implements Runnable {
                         return false;
                     } else if (process == 5) {
                         stn.firstscan = true;
-                        stn.PreviousCard = stn.CardInput2.getText();
+                        //stn.PreviousCard = stn.CardInput2.getText();
+                        stn.PreviousCard = stn.Cardinput.toString();
                         stn.processRightPanelMsgs(cmp.PrksMsg);
                         stn.clearLeftMIDMsgPanel();
                         stn.processRightPanelMsgs(cmp.PrksMsg);
