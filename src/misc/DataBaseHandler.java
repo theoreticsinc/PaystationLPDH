@@ -85,6 +85,8 @@ public class DataBaseHandler extends Thread {
     private String USERNAME = "root";
     private String PASSWORD = "sa";
     public String EX_SentinelID;
+    public String msgBody;
+    public String msgSignature;
     private Connection connection = null;
     private Connection backupConnection = null;
     private Statement st;
@@ -114,6 +116,14 @@ public class DataBaseHandler extends Thread {
             EX_SentinelID = xr.getElementValue("C://JTerminals/initH.xml", "HXterminal_id");
         } catch (Exception ex) {
             log.error(ex.getMessage());
+        }
+    }
+    
+    public void manualConnect() {
+        try {
+            connection = getConnection(true);        
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
     }
 
@@ -2401,6 +2411,41 @@ public class DataBaseHandler extends Thread {
 
         return newString;
     }    
+
+    
+    public boolean findMessage(String receiver) {
+        boolean msgPresent = false;
+        try {
+//        connection = getConnection(true);
+        ResultSet rs = selectDatabyFields("SELECT * FROM message_board.vips WHERE recipient='"+receiver+"'");
+        
+        // iterate through the java resultset
+        while (rs.next()) {
+            msgBody = rs.getString("msgBody");
+            msgSignature = rs.getString("msgSignature");
+            msgPresent = true;
+        }
+        st.close();
+//        connection.close();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return msgPresent;
+    }
+    
+    public boolean deleteMessage(String receiver) {
+        boolean msgPresent = false;
+        try {
+        connection = getConnection(true);
+        st = (Statement) connection.createStatement();
+        st.execute("DELETE FROM message_board.vips WHERE recipient='"+receiver+"'");
+        st.close();
+        connection.close();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return msgPresent;
+    }
 
     class prewait extends Thread {
 

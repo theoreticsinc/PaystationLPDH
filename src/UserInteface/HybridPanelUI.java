@@ -365,6 +365,7 @@ public class HybridPanelUI extends javax.swing.JFrame implements WindowFocusList
         //Switch_Entry.setIcon(new javax.swing.ImageIcon(getClass().getResource("/hybrid/resources/SwitchEntryA.png")));
         //Switch_Exit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/hybrid/resources/SwitchExit.png")));
         MainFuncPad.setVisible(false);
+        MessagePanel.setVisible(false);
         PasswordPanel.setVisible(false);
         MasterCardPanel.setVisible(false);
         CouponPanel.setVisible(false);
@@ -562,6 +563,11 @@ public class HybridPanelUI extends javax.swing.JFrame implements WindowFocusList
         motorNum = new javax.swing.JTextField();
         motorPlusbtn = new javax.swing.JLabel();
         fullScreenCamera = new javax.swing.JLabel();
+        MessagePanel = new javax.swing.JPanel();
+        msgBody = new javax.swing.JLabel();
+        msgSignature = new javax.swing.JLabel();
+        jLabel12 = new javax.swing.JLabel();
+        closeButton2 = new javax.swing.JButton();
         ManualEntryPanel = new javax.swing.JPanel();
         closeButton1 = new javax.swing.JButton();
         jLabel5 = new javax.swing.JLabel();
@@ -1383,6 +1389,42 @@ public class HybridPanelUI extends javax.swing.JFrame implements WindowFocusList
         });
         getContentPane().add(fullScreenCamera);
         fullScreenCamera.setBounds(0, 0, 71, 30);
+
+        MessagePanel.setBackground(new java.awt.Color(255, 255, 255));
+        MessagePanel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        MessagePanel.setLayout(null);
+
+        msgBody.setText("Message Body");
+        msgBody.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        msgBody.setForeground(new java.awt.Color(0, 153, 153));
+        MessagePanel.add(msgBody);
+        msgBody.setBounds(80, 0, 420, 60);
+
+        msgSignature.setText("Message Signature");
+        msgSignature.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        msgSignature.setForeground(new java.awt.Color(255, 255, 255));
+        MessagePanel.add(msgSignature);
+        msgSignature.setBounds(80, 80, 410, 50);
+
+        jLabel12.setBackground(new java.awt.Color(0, 153, 255));
+        jLabel12.setForeground(new java.awt.Color(0, 153, 255));
+        jLabel12.setOpaque(true);
+        MessagePanel.add(jLabel12);
+        jLabel12.setBounds(10, 70, 490, 60);
+
+        closeButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/hybrid/resources/close window.png"))); // NOI18N
+        closeButton2.setOpaque(false);
+        closeButton2.setPreferredSize(new java.awt.Dimension(50, 50));
+        closeButton2.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                closeButton2MouseClicked(evt);
+            }
+        });
+        MessagePanel.add(closeButton2);
+        closeButton2.setBounds(0, 0, 70, 70);
+
+        getContentPane().add(MessagePanel);
+        MessagePanel.setBounds(470, 310, 510, 140);
 
         ManualEntryPanel.setBackground(new java.awt.Color(255, 255, 255));
         ManualEntryPanel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
@@ -5157,6 +5199,12 @@ private void ENTERManualEnter(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_
         manualEntryTime.setTimeToNow();
     }//GEN-LAST:event_XFunc12MouseClicked
 
+    private void closeButton2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_closeButton2MouseClicked
+        MessagePanel.setVisible(false);
+        DataBaseHandler dbh = new DataBaseHandler();
+        dbh.deleteMessage(EX_SentinelID);
+    }//GEN-LAST:event_closeButton2MouseClicked
+
     private void OverrideSwitch_set2Exit(boolean setExit) {
 //        this.clearLeftMIDMsgPanel();
 //        this.clearRightPanel(); 
@@ -6743,7 +6791,8 @@ private void ENTERManualEnter(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_
 
         @Override
         public void run() {
-
+            DataBaseHandler dbh = new DataBaseHandler();
+            dbh.manualConnect();
             try {
                 while (true) {
                     SystemStatus ss = new SystemStatus();
@@ -6756,6 +6805,14 @@ private void ENTERManualEnter(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_
                             //ss.updateServerCRDPLT();
 //                        ss.deleteOfflineCRDPLT(serverIP);
 //                        ss.updateCoupons(serverIP);
+                            
+                            boolean msgFound = dbh.findMessage(EX_SentinelID);
+                            if (msgFound) {
+                                MessagePanel.setVisible(msgFound);
+                                msgBody.setText(dbh.msgBody);
+                                msgSignature.setText(dbh.msgSignature);
+                            }
+                            Thread.sleep(5000);
                         } else if (ss.checkOnline() == false) {
                             ServerStatus.setForeground(new java.awt.Color(255, 120, 0));
                             ServerStatus.setText("OFFLINE");
@@ -6782,7 +6839,6 @@ private void ENTERManualEnter(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_
                     }
                     Thread.sleep(1000);
                     //resetAdmin();
-                    Thread.sleep(2000);
                 }
             } catch (Exception ex) {
                 log.error(ex.getMessage());
@@ -7129,6 +7185,7 @@ private void ENTERManualEnter(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_
     private javax.swing.JLabel MasterCardLbl;
     private javax.swing.JPanel MasterCardPanel;
     private javax.swing.JLabel MasterFun;
+    private javax.swing.JPanel MessagePanel;
     private javax.swing.JPanel MidMsgPanel;
     private javax.swing.JLabel Mode;
     private javax.swing.JLabel N;
@@ -7288,6 +7345,7 @@ private void ENTERManualEnter(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_
     private javax.swing.JLabel cashColLbl;
     private javax.swing.JButton closeButton;
     private javax.swing.JButton closeButton1;
+    private javax.swing.JButton closeButton2;
     private javax.swing.JLabel datedisplay;
     private javax.swing.JLabel daydisplay;
     public javax.swing.JLabel entryCamera;
@@ -7308,6 +7366,7 @@ private void ENTERManualEnter(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_
     private javax.swing.JPanel inputPanel;
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -7333,6 +7392,8 @@ private void ENTERManualEnter(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_
     private javax.swing.JLabel motorMinusbtn;
     private javax.swing.JTextField motorNum;
     private javax.swing.JLabel motorPlusbtn;
+    private javax.swing.JLabel msgBody;
+    private javax.swing.JLabel msgSignature;
     private javax.swing.JPanel newMidPanel;
     private javax.swing.JLabel num0;
     private javax.swing.JLabel num1;
