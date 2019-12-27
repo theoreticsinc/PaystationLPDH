@@ -534,11 +534,12 @@ public class DataBaseHandler extends Thread {
         return img;
     }
     
-    public BufferedImage Get2ndImageFromDB(String CardCode) {
-        BufferedImage img = null;
+    public BufferedImage Get2ndImageFromDB(String cardNumber) {
+    BufferedImage img = null;
         try {
             connection = getConnection(true);
-            String sql = "SELECT CardCode, Plate, PIC2 FROM unidb.timeindb WHERE CardCode = '" + CardCode + "'";
+            //String sql = "SELECT CardCode, Plate, PIC FROM unidb.timeindb WHERE CardCode = '" + cardNumber + "'";
+            String sql = "SELECT cardNumber, plateNumber, PIC2 FROM crdplt.main WHERE cardNumber = '" + cardNumber + "'";
             PreparedStatement stmt = connection.prepareStatement(sql);
             ResultSet resultSet = stmt.executeQuery();
 
@@ -586,7 +587,7 @@ public class DataBaseHandler extends Thread {
         } catch (Exception ex) {
             java.util.logging.Logger.getLogger(DataBaseHandler.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
-        return img;
+        return img;        
     }
     
     public BufferedImage GetImageFromEXTCRDDB(String CardCode) {

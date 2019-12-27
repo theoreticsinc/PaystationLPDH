@@ -482,7 +482,7 @@ public class HybridPanelUI extends javax.swing.JFrame implements WindowFocusList
         ThrSlotsClock.start();
         ShowExitCamera sec = new ShowExitCamera();
         ThrShowExitCamera = new Thread(sec);
-        ThrShowExitCamera.start();
+//        ThrShowExitCamera.start();
         //OnlineQuickUpdater qc = new OnlineQuickUpdater();
         //ThrQuickUpdaterClock = new Thread(qc);
         //ThrQuickUpdaterClock.start();
