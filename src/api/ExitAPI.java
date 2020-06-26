@@ -62,6 +62,27 @@ public class ExitAPI implements Runnable {
                 stn.SysMessage13.setText("Card Number: " + vChkr.vipNumber);
                 stn.SysMessage14.setText("VIP NAME : " + vChkr.vipName);
                 stn.SysMessage16.setText("Expiration Date: " + vChkr.expDate);
+                                        DataBaseHandler dbh = new DataBaseHandler();
+                        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+
+                        BufferedImage buf1 = dbh.GetImageFromDB(stn.CardInput2.getText());
+                        
+                        if (null != buf1) {
+                            Image img = getScaledImage(buf1, screenSize.width / 4 + 100, screenSize.height / 3);
+
+                            stn.entryCamera.setIcon(new ImageIcon(img));
+                            stn.entryCamera.setText("DRIVERS");
+                        }
+                        
+                        BufferedImage buf2 = dbh.Get2ndImageFromDB(stn.CardInput2.getText());
+                        if (null != buf2) {
+                            Image img2 = getScaledImage(buf2, screenSize.width / 4 + 100, screenSize.height / 3);
+
+                            stn.exitCamera.setIcon(new ImageIcon(img2));
+                            stn.exitCamera.setText("PLATE");
+                        }
+                        //stn.AmtTendered.requestFocus();
+                           
             }
             if (null == vChkr.expDate || vChkr.expDate.before(NowStamp)) {
                 vChkr.vipNumber = null;
